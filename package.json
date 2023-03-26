@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "cypress": "^12.8.1"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/cypress run"
+  }
+}
