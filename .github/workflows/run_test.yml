@@ -28,17 +28,13 @@ jobs:
           echo "::set-output name=status::success"
       
       - name: Post Status Update
-        id: update-status
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.PAT }}
-          script: |
-            const response = await github.repos.createCommitStatus({
-              owner: 'dhivyakkumar',
-              repo: 'Playwright-Automation',
-              sha: ${{ github.sha }},
-              state: 'success',
-              description: 'Test execution completed successfully',
-              context: 'test-execution'
-            });
-            console.log(response);
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT }}" \
+            https://api.github.com/repos/dhivyakkumar/Playwright-Automation/statuses/${{ github.sha }} \
+            -d '{
+              "state": "success",
+              "description": "Tests passed successfully",
+              "context": "test-status"
+            }'
