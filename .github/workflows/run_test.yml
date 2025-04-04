@@ -22,14 +22,23 @@ jobs:
       - name: Cypress run
         run: npx cypress run
         
-      # - uses: actions/upload-artifact@v3
-      #   if: failure()
-      #   with:
-      #     name: cypress-screenshots
-      #     path: cypress/screenshots
-      # # Test run video was always captured, so this action uses "always()" condition
-      # - uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: cypress-videos
-      #     path: cypress/videos
+      - name: Update Status
+        run: |
+          echo "Test execution completed successfully" > test_status.txt
+          echo "::set-output name=status::success"
+      
+      - name: Post Status Update
+        id: update-status
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const response = await github.repos.createCommitStatus({
+              owner: 'dhivyakkumar',
+              repo: 'Playwright-Automation',
+              sha: ${{ github.sha }},
+              state: 'success',
+              description: 'Test execution completed successfully',
+              context: 'test-execution'
+            });
+            console.log(response);
