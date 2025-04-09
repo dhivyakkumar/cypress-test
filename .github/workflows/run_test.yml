@@ -21,13 +21,7 @@ jobs:
         
       - name: Cypress run
         run: |
-          if npx cypress run; then
-            echo "Cypress tests passed successfully"
-            test_status="success"
-          else
-            echo "Cypress tests failed"
-            test_status="failure"
-          fi
+          npx cypress run
         
       # - name: Update Status
       #   run: |
@@ -55,7 +49,6 @@ jobs:
               owner: 'dhivyakkumar',
               repo: 'Playwright-Automation',
               event_type: 'test-status',
-              # client_payload: { status: '${{ test_status }}', pr_number: ${{ github.event.client_payload.pr_number }} }
               client_payload: { status: "success", pr_number: ${{ github.event.client_payload.pr_number }} }
             });
             console.log(response);
