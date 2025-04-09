@@ -20,21 +20,41 @@ jobs:
         run: npm install
         
       - name: Cypress run
-        run: npx cypress run
+        run: |
+          if npx cypress run; then
+            echo "Cypress tests passed successfully"
+            test_status="success"
+          else
+            echo "Cypress tests failed"
+            test_status="failure"
+          fi
         
-      - name: Update Status
-        run: |
-          echo "Test execution completed successfully" > test_status.txt
-          echo "::set-output name=status::success"
+      # - name: Update Status
+      #   run: |
+      #     echo "Test execution completed successfully" > test_status.txt
+      #     echo "::set-output name=status::success"
       
-      - name: Post Status Update
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: Bearer ${{ secrets.PAT }}" \
-            https://api.github.com/repos/dhivyakkumar/Playwright-Automation/statuses/${{ github.sha }} \
-            -d '{
-              "state": "success",
-              "description": "Tests passed successfully",
-              "context": "test-status"
-            }'
+      # - name: Post Status Update
+      #   run: |
+      #     curl -X POST \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       -H "Authorization: Bearer ${{ secrets.PAT }}" \
+      #       https://api.github.com/repos/dhivyakkumar/Playwright-Automation/statuses/${{ github.sha }} \
+      #       -d '{
+      #         "state": "success",
+      #         "description": "Tests passed successfully",
+      #         "context": "test-status"
+      #       }'
+
+      - name: Report Test Status to Repository A
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const response = await github.repos.createDispatchEvent({
+              owner: 'dhivyakkumar',
+              repo: 'Playwright-Automation',
+              event_type: 'test-status',
+              client_payload: { status: '${{ test_status }}', pr_number: ${{ github.event.client_payload.pr_number }} }
+            });
+            console.log(response);
