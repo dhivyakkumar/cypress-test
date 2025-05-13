@@ -1,4 +1,4 @@
-name: Trigger Test Workflow
+name: Trigger Test Workflow test
 
 on:
   pull_request:
